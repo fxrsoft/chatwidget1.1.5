@@ -150,6 +150,14 @@ ws.onmessage = function(event) {
     const data = JSON.parse(event.data);
     const lastMessageElement = chatbox.lastElementChild.querySelector("p");
     const md = window.markdownit({ html: true });
+
+    // Ensure data.text and data.message are strings 
+    if (data.text && typeof data.text !== 'string') { 
+          data.text = String(data.text); } 
+    if (data.message && typeof data.message !== 'string') { 
+          data.message = String(data.message); 
+    }  
+      
     // Check if the data from the server is a button
     if (data.type === 'buttonResponse') {
       // Append the server's response to the chatbox as an incoming message
