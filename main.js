@@ -151,136 +151,81 @@ ws.onmessage = function(event) {
     const lastMessageElement = chatbox.lastElementChild.querySelector("p");
     const md = window.markdownit({ html: true });
 
-    // Ensure data.text and data.message are strings 
-    if (data.text && typeof data.text !== 'string') { 
-          data.text = String(data.text); } 
-    if (data.message && typeof data.message !== 'string') { 
-          data.message = String(data.message); 
-    }  
-      
+    // Ensure data.text and data.message are strings
+    if (data.text && typeof data.text !== 'string') {
+        data.text = String(data.text);
+    }
+    if (data.message && typeof data.message !== 'string') {
+        data.message = String(data.message);
+    }
+
     // Check if the data from the server is a button
     if (data.type === 'buttonResponse') {
-      // Append the server's response to the chatbox as an incoming message
-      chatbox.appendChild(createChatLi(data.text, "outgoing"));  //incoming
-      chatbox.scrollTo(0, chatbox.scrollHeight);
+        chatbox.appendChild(createChatLi(data.text, "outgoing"));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
     } else if (data.type === 'button') {
         // Create a button element
         let btn = document.createElement('button');
         btn.textContent = data.text;
-        btn.style.backgroundColor = config.chatbotColor; // Same color as the avatar
-        btn.style.color = 'white'; // White text
-        btn.style.borderRadius = '12px'; // Rounded corners
-        btn.style.border = 'none'; // No border
-        btn.style.padding = '10px 20px'; // Padding
-        btn.style.textAlign = 'center'; // Centered text
-        btn.style.textDecoration = 'none'; // No underline
+        btn.style.backgroundColor = config.chatbotColor;
+        btn.style.color = 'white';
+        btn.style.borderRadius = '12px';
+        btn.style.border = 'none';
+        btn.style.padding = '10px 20px';
+        btn.style.textAlign = 'center';
+        btn.style.textDecoration = 'none';
         btn.style.display = 'inline-block';
         btn.style.fontSize = '12px';
         btn.style.margin = '4px 2px';
-        btn.style.cursor = 'pointer'; // Cursor pointer on hover
-        host: location.hostname,
-
-      btn.onclick = function() {
-        // Send a message back when the button is clicked
-        ws.send(JSON.stringify({ action: data.action, text: data.text, host: location.hostname, kb: config.knowledgeBase, chatid: config.chatId }));
-    
-        // Append the button's text to the chatbox as an outgoing message
-        chatbox.appendChild(createChatLi(data.text, "outgoing"));
-        chatbox.scrollTo(0, chatbox.scrollHeight);
-    };
-
-        // Append the button to the chatbox
+        btn.style.cursor = 'pointer';
+        btn.onclick = function() {
+            ws.send(JSON.stringify({ action: data.action, text: data.text, host: location.hostname, kb: config.knowledgeBase, chatid: config.chatId }));
+            chatbox.appendChild(createChatLi(data.text, "outgoing"));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        };
         chatbox.appendChild(btn);
-
     } else if (data.type === 'fdbutton') {
         // Create a button element
         let btn = document.createElement('button');
         btn.textContent = data.text;
-        btn.style.backgroundColor = config.chatbotColor; // Same color as the avatar
-        btn.style.color = 'white'; // White text
-        btn.style.borderRadius = '12px'; // Rounded corners
-        btn.style.border = 'none'; // No border
-        btn.style.padding = '10px 20px'; // Padding
-        btn.style.textAlign = 'center'; // Centered text
-        btn.style.textDecoration = 'none'; // No underline
+        btn.style.backgroundColor = config.chatbotColor;
+        btn.style.color = 'white';
+        btn.style.borderRadius = '12px';
+        btn.style.border = 'none';
+        btn.style.padding = '10px 20px';
+        btn.style.textAlign = 'center';
+        btn.style.textDecoration = 'none';
         btn.style.display = 'inline-block';
         btn.style.fontSize = '12px';
         btn.style.margin = '4px 2px';
-        btn.style.cursor = 'pointer'; // Cursor pointer on hover
-        host: location.hostname,
+        btn.style.cursor = 'pointer';
         btn.onclick = function() {
-            // Send a message back to Node-RED when the button is clicked
             ws.send(JSON.stringify({ action: data.action, host: location.hostname, kb: config.knowledgeBase, chatid: config.chatId }));
         };
-
-        // Append the button to the chatbox
         chatbox.appendChild(btn);
-
-  } else if (data.type === 'message') {
-        // Create a new paragraph element
-        // let p = document.createElement('p');
-        // p.textContent = data.text;
-        // p.style.fontSize = '20px';
-        // // Append the paragraph to the chatbox
-        // chatbox.appendChild(p);'
-
+    } else if (data.type === 'message') {
         // Parse the markdown text to HTML
         let html = md.render(data.text);
-
         // Create a new element to display the message
         let div = document.createElement('div');
         div.innerHTML = html;
         div.style.fontSize = '14px';
-        // Append the message to the chatbox
         chatbox.appendChild(div);
-
-
-
-        // Parse the markdown text to HTML
-        //let html = md.render(data.text);
-        //chatbox.appendChild(createChatLi(html, "incoming"));
-        //chatbox.appendChild(createChatLi(data.text, "incoming"));
-        //chatbox.scrollTo(0, chatbox.scrollHeight);
     } else {
         // Handle text message
         if (lastMessageElement) {
             // Initialize markdown-it
             const md = window.markdownit({ html: true });
-
             // Render the markdown text
             let html = md.render(data.message);
             // Set the innerHTML of the last message element to the rendered HTML
             lastMessageElement.innerHTML = html;
-    
-            // Change the font size to 14px
-            lastMessageElement.style.fontSize = "14px";
-
-
-
-
-
-            // lastMessageElement.textContent = data.message;
-            // // Change the font size to 14px
-            // lastMessageElement.style.fontSize = "16px";
-            
+            lastMessageElement.style.fontSize = '14px';
         }
     }
-
     chatbox.scrollTo(0, chatbox.scrollHeight);
+};
 
-    // Check if the data from the server contains an image URL
-    // if (data.url) {
-    //     // Create an image element
-    //     let img = document.createElement('img');
-    //     img.src = data.url;
-    //     img.style.width = '300px'; // Set the width to 300px
-    //     img.style.display = 'block';
-
-    //     // Append the image to the chatbox
-    //     chatbox.appendChild(img);
-    //     chatbox.scrollTo(0, chatbox.scrollHeight);
-    // }
-}
 
 chatInput.addEventListener("input", () => {
     // Adjust the height of the input textarea based on its content
